@@ -1,0 +1,63 @@
+name: deploy
+on: 
+  push: 
+    branches:
+      main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: pushd /tmp && git clone --depth 1 https://github.com/awslabs/git-secrets.git && cd ./git-secrets && PREFIX=/tmp/git-secrets make install && popd
+      - run: npm install -g typescript
+      - run: npm install -g yarn
+      - run: npm install -g oss-attribution-generator
+      - run: npm install -g @aws/pdk
+      - run: pdk install --frozen-lockfile
+      - run: REACT_APP_ROUTE_BASE_PATH=/threat-composer REACT_APP_GITHUB_PAGES=true PUBLIC_URL=https://awslabs.github.io/threat-composer PATH=/tmp/git-secrets/bin:$PATH pdk run build
+      - run: sed -i "s/<\/body>/<img\ src=\"https:\/\/assets.threat-composer.aws.dev\/1x1.png\"\ style=\"visibility:hidden;\">&/g" packages/threat-composer-app/build/website/index.html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/threat-composer-app/build/website
+  deploy:
+    needs: build
+    permissions:
+      pages: write    
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+  release:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+      issues: write
+      pull-requests: write 
+      id-token: write 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Release to GitHub Release
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release@22
