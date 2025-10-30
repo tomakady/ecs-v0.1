@@ -16,9 +16,9 @@
 import { STATUS_NOT_SET } from '../../../../configs/status';
 import { DataExchangeFormat } from '../../../../customTypes';
 import threatStatus from '../../../../data/status/threatStatus.json';
-import escapeMarkdown from '../../../../utils/escapeMarkdown';
-import parseTableCellContent from '../../../../utils/parseTableCellContent';
-import standardizeNumericId from '../../../../utils/standardizeNumericId';
+import escapeMarkdown from '../../../escapeMarkdown';
+import parseTableCellContent from '../../../parseTableCellContent';
+import standardizeNumericId from '../../../standardizeNumericId';
 
 export const getThreatsContent = async (
   data: DataExchangeFormat,

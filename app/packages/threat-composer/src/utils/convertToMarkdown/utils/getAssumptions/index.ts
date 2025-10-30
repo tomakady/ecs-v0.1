@@ -14,9 +14,9 @@
   limitations under the License.
  ******************************************************************************************************************** */
 import { DataExchangeFormat } from '../../../../customTypes';
-import escapeMarkdown from '../../../../utils/escapeMarkdown';
-import parseTableCellContent from '../../../../utils/parseTableCellContent';
-import standardizeNumericId from '../../../../utils/standardizeNumericId';
+import escapeMarkdown from '../../../escapeMarkdown';
+import parseTableCellContent from '../../../parseTableCellContent';
+import standardizeNumericId from '../../../standardizeNumericId';
 
 export const getAssumptionsContent = async (
   data: DataExchangeFormat,
