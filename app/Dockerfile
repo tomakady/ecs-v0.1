@@ -1,6 +1,6 @@
 FROM public.ecr.aws/amazonlinux/amazonlinux:latest as build
 
-RUN dnf install tar gzip python3 gcc-c++ make python3-pip rsync shadow-utils -y
+RUN dnf install tar gzip python3 gcc-c++ make python3-pip rsync shadow-utils dos2unix -y
 
 ENV NVM_DIR /usr/local/nvm
 ENV NODE_VERSION 20
@@ -40,7 +40,7 @@ WORKDIR /app
 
 # #Copy files into the Docker image
 COPY --chown=app:app . .
-RUN ./scripts/build.sh
+RUN dos2unix scripts/build.sh && chmod +x scripts/build.sh && bash scripts/build.sh
 
 # # Stage 2: Serve the application using Nginx
 FROM nginx:alpine
